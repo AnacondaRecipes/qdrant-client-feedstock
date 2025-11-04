@@ -46,7 +46,7 @@ test:
     - qdrant_client
   commands:
     - pip check
-    - pytest -v {{ ignore_integration_test | join(" ")}}
+    - pytest -v {{ ignore_integration_test | join(" ")}} # [not win]
     - pytest -v {{ ignore_integration_test | join(" ")}} "--ignore=tests/test_local_persistence.py" # [win]
   requires:
     - pip
