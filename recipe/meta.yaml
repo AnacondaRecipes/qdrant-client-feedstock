@@ -47,6 +47,7 @@ test:
   commands:
     - pip check
     - pytest -v {{ ignore_integration_test | join(" ")}}
+    - pytest -v {{ ignore_integration_test | join(" ")}} "--ignore=tests/test_local_persistence.py" # [win]
   requires:
     - pip
     - python
@@ -56,7 +57,15 @@ test:
 about:
   home: https://github.com/qdrant/qdrant-client
   summary: Python client for Qdrant vector search engine
+  description: |
+    Client library and SDK for the Qdrant vector search engine.
+    Library contains type definitions for all Qdrant API and allows to make both Sync and Async requests.
+    Client allows calls for all Qdrant API methods directly. It also provides some additional 
+    helper methods for frequently required operations, e.g. initial collection uploading.
+  dev_url: https://github.com/qdrant/qdrant-client
+  doc_url: https://github.com/qdrant/qdrant-client/blob/master/README.md
   license: Apache-2.0
+  license_family: Apache
   license_file: LICENSE
 
 extra:
