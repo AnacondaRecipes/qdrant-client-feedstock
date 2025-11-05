@@ -6,46 +6,69 @@ package:
   version: {{ version }}
 
 source:
-  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/qdrant_client-{{ version }}.tar.gz
-  sha256: 631f1f3caebfad0fd0c1fba98f41be81d9962b7bf3ca653bed3b727c0e0cbe0e
+  url: https://github.com/qdrant/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
+  sha256: 01e8870253493024d527bae5466c0864bf10cb5e1621f5fe23d5154582cd3f2b
 
 build:
-  noarch: python
+  skip: True # [py<39]
   script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
   number: 0
 
 requirements:
   host:
-    - python {{ python_min }}
+    - python
     - pip
-    - poetry
+    - poetry-core
     - setuptools
   run:
-    - python >={{ python_min }}
+    - python
+    - protobuf >=3.20
+    - numpy >=1.21 # [py<312]
+    - numpy >=1.26 # [py==312]
+    - numpy >=2.1 # [py>=313]
     - httpx >=0.20.0
-    - numpy >=1.21
     - pydantic >=1.10.8
-    - grpcio >=1.41.0
+    - grpcio >=1.10.8,!=2.0,!=2.1,!=2.2.0
     - grpcio-tools >=1.41.0
     - urllib3 >=1.26.14,<3
-    - portalocker >=2.7.0,<3.0.0
+    - portalocker >=2.7.0,<4.0
   run_constrained:
-    - fastembed >=0.2.5
+    - fastembed >=0.7
 
-
+{% set ignore_integration_test = [
+  "--ignore=tests/congruence_tests",
+  "--ignore=tests/test_qdrant_client.py",
+  "--ignore=tests/test_migrate.py",
+  "--ignore=tests/test_async_qdrant_client.py"
+]%}
 test:
+  source_files:
+    - tests
+    - pyproject.toml
   imports:
     - qdrant_client
   commands:
     - pip check
+    - pytest -v {{ ignore_integration_test | join(" ")}} # [not win]
+    - pytest -v {{ ignore_integration_test | join(" ")}} "--ignore=tests/test_local_persistence.py" # [win]
   requires:
     - pip
-    - python {{ python_min }}
+    - python
+    - pytest
+    - pytest-docker-tools
 
 about:
   home: https://github.com/qdrant/qdrant-client
   summary: Python client for Qdrant vector search engine
+  description: |
+    Client library and SDK for the Qdrant vector search engine.
+    Library contains type definitions for all Qdrant API and allows to make both Sync and Async requests.
+    Client allows calls for all Qdrant API methods directly. It also provides some additional 
+    helper methods for frequently required operations, e.g. initial collection uploading.
+  dev_url: https://github.com/qdrant/qdrant-client
+  doc_url: https://github.com/qdrant/qdrant-client/blob/master/README.md
   license: Apache-2.0
+  license_family: Apache
   license_file: LICENSE
 
 extra:
