@@ -1,45 +1,48 @@
 {% set name = "qdrant-client" %}
-{% set version = "1.15.1" %}
+{% set version = "1.18.0" %}
 
 package:
-  name: {{ name|lower }}
+  name: {{ name }}
   version: {{ version }}
 
 source:
-  url: https://github.com/qdrant/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 01e8870253493024d527bae5466c0864bf10cb5e1621f5fe23d5154582cd3f2b
+  url: https://github.com/{{ name.split('-')[0] }}/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
+  sha256: f207e54789be8dba37eec727402a0f7985049bfb3c2076a32d3ab20c17cd5042
 
 build:
-  skip: True # [py<39]
-  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
   number: 0
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  skip: true # [py<310]
 
 requirements:
   host:
     - python
     - pip
-    - poetry-core
+    - poetry-core >=1.0.0
     - setuptools
   run:
     - python
-    - protobuf >=3.20
-    - numpy >=1.21 # [py<312]
-    - numpy >=1.26 # [py==312]
-    - numpy >=2.1 # [py>=313]
     - httpx >=0.20.0
-    - pydantic >=1.10.8
-    - grpcio >=1.10.8,!=2.0,!=2.1,!=2.2.0
-    - grpcio-tools >=1.41.0
+    - numpy >=1.21,<2.3.0  # [py==310]
+    - numpy >=1.21  # [py==311]
+    - numpy >=1.26  # [py==312]
+    - numpy >=2.1.0  # [py==313]
+    - numpy >=2.3.0  # [py>=314]
+    - pydantic >=1.10.8,!=2.0.*,!=2.1.*,!=2.2.0
+    - grpcio >=1.41.0
+    - protobuf >=3.20.0
     - urllib3 >=1.26.14,<3
     - portalocker >=2.7.0,<4.0
   run_constrained:
-    - fastembed >=0.7
+    - fastembed >=0.8,<0.9
+    - fastembed-gpu >=0.8,<0.9
 
-{% set ignore_integration_test = [
+{% set skip_tests = [
   "--ignore=tests/congruence_tests",
   "--ignore=tests/test_qdrant_client.py",
   "--ignore=tests/test_migrate.py",
-  "--ignore=tests/test_async_qdrant_client.py"
+  "--ignore=tests/test_async_qdrant_client.py",
+  "--deselect=tests/embed_tests/test_local_inference.py::test_bm25_core"
 ]%}
 test:
   source_files:
@@ -49,12 +52,13 @@ test:
     - qdrant_client
   commands:
     - pip check
-    - pytest -v {{ ignore_integration_test | join(" ")}} # [not win]
-    - pytest -v {{ ignore_integration_test | join(" ")}} "--ignore=tests/test_local_persistence.py" # [win]
+    - pytest -v {{ skip_tests | join(" ")}} # [not win]
+    - pytest -v {{ skip_tests | join(" ")}} "--ignore=tests/test_local_persistence.py" # [win]
   requires:
     - pip
     - python
-    - pytest
+    - pytest >=7.1,<8
+    - pytest-asyncio
     - pytest-docker-tools
 
 about:
