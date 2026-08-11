@@ -1,5 +1,12 @@
 {% set name = "qdrant-client" %}
-{% set version = "1.18.0" %}
+{% set version = "1.19.0" %}
+{% set skip_tests = [
+  "--ignore=tests/congruence_tests",
+  "--ignore=tests/test_qdrant_client.py",
+  "--ignore=tests/test_migrate.py",
+  "--ignore=tests/test_async_qdrant_client.py",
+  "--deselect=tests/embed_tests/test_local_inference.py::test_bm25_core"
+] %}
 
 package:
   name: {{ name }}
@@ -7,12 +14,12 @@ package:
 
 source:
   url: https://github.com/{{ name.split('-')[0] }}/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: f207e54789be8dba37eec727402a0f7985049bfb3c2076a32d3ab20c17cd5042
+  sha256: d388bce332f2a28b253a229c4f6b58f2da0ff919267826ba51334f3809f0d2ca
 
 build:
   number: 0
   script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
-  skip: true # [py<310]
+  skip: true  # [py<310]
 
 requirements:
   host:
@@ -37,13 +44,6 @@ requirements:
     - fastembed >=0.8,<0.9
     - fastembed-gpu >=0.8,<0.9
 
-{% set skip_tests = [
-  "--ignore=tests/congruence_tests",
-  "--ignore=tests/test_qdrant_client.py",
-  "--ignore=tests/test_migrate.py",
-  "--ignore=tests/test_async_qdrant_client.py",
-  "--deselect=tests/embed_tests/test_local_inference.py::test_bm25_core"
-]%}
 test:
   source_files:
     - tests
@@ -52,8 +52,8 @@ test:
     - qdrant_client
   commands:
     - pip check
-    - pytest -v {{ skip_tests | join(" ")}} # [not win]
-    - pytest -v {{ skip_tests | join(" ")}} "--ignore=tests/test_local_persistence.py" # [win]
+    - pytest -v {{ skip_tests | join(" ")}}  # [not win]
+    - pytest -v {{ skip_tests | join(" ")}} "--ignore=tests/test_local_persistence.py"  # [win]
   requires:
     - pip
     - python
@@ -67,7 +67,7 @@ about:
   description: |
     Client library and SDK for the Qdrant vector search engine.
     Library contains type definitions for all Qdrant API and allows to make both Sync and Async requests.
-    Client allows calls for all Qdrant API methods directly. It also provides some additional 
+    Client allows calls for all Qdrant API methods directly. It also provides some additional
     helper methods for frequently required operations, e.g. initial collection uploading.
   dev_url: https://github.com/qdrant/qdrant-client
   doc_url: https://github.com/qdrant/qdrant-client/blob/master/README.md
