@@ -1,12 +1,5 @@
 {% set name = "qdrant-client" %}
 {% set version = "1.19.0" %}
-{% set skip_tests = [
-  "--ignore=tests/congruence_tests",
-  "--ignore=tests/test_qdrant_client.py",
-  "--ignore=tests/test_migrate.py",
-  "--ignore=tests/test_async_qdrant_client.py",
-  "--deselect=tests/embed_tests/test_local_inference.py::test_bm25_core"
-] %}
 
 package:
   name: {{ name }}
@@ -44,6 +37,14 @@ requirements:
     - fastembed >=0.8,<0.9
     - fastembed-gpu >=0.8,<0.9
 
+{% set skip_tests = [
+  "--ignore=tests/congruence_tests",
+  "--ignore=tests/test_qdrant_client.py",
+  "--ignore=tests/test_migrate.py",
+  "--ignore=tests/test_async_qdrant_client.py",
+  "--deselect=tests/embed_tests/test_local_inference.py::test_bm25_core"
+] %}
+
 test:
   source_files:
     - tests
@@ -52,8 +53,8 @@ test:
     - qdrant_client
   commands:
     - pip check
-    - pytest -v {{ skip_tests | join(" ")}}  # [not win]
-    - pytest -v {{ skip_tests | join(" ")}} "--ignore=tests/test_local_persistence.py"  # [win]
+    - pytest -vv {{ skip_tests | join(" ")}}  # [not win]
+    - pytest -vv {{ skip_tests | join(" ")}} "--ignore=tests/test_local_persistence.py"  # [win]
   requires:
     - pip
     - python
