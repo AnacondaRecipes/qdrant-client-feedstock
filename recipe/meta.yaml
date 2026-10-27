@@ -1,5 +1,12 @@
 {% set name = "qdrant-client" %}
-{% set version = "1.19.0" %}
+{% set version = "1.20.0" %}
+{% set skip_tests = [
+  "--ignore=tests/congruence_tests",
+  "--ignore=tests/test_qdrant_client.py",
+  "--ignore=tests/test_migrate.py",
+  "--ignore=tests/test_async_qdrant_client.py",
+  "--deselect=tests/embed_tests/test_local_inference.py::test_bm25_core"
+] %}
 
 package:
   name: {{ name }}
@@ -7,7 +14,7 @@ package:
 
 source:
   url: https://github.com/{{ name.split('-')[0] }}/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: d388bce332f2a28b253a229c4f6b58f2da0ff919267826ba51334f3809f0d2ca
+  sha256: 96f62fca4d8910f9406da2037f4a70f0e8eadb2742f2d07207617f21faea5047
 
 build:
   number: 0
@@ -36,14 +43,6 @@ requirements:
   run_constrained:
     - fastembed >=0.8,<0.9
     - fastembed-gpu >=0.8,<0.9
-
-{% set skip_tests = [
-  "--ignore=tests/congruence_tests",
-  "--ignore=tests/test_qdrant_client.py",
-  "--ignore=tests/test_migrate.py",
-  "--ignore=tests/test_async_qdrant_client.py",
-  "--deselect=tests/embed_tests/test_local_inference.py::test_bm25_core"
-] %}
 
 test:
   source_files:
