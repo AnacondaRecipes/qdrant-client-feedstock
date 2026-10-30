@@ -1,5 +1,5 @@
 {% set name = "qdrant-client" %}
-{% set version = "1.19.0" %}
+{% set version = "1.20.0" %}
 
 package:
   name: {{ name }}
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/{{ name.split('-')[0] }}/{{ name }}/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: d388bce332f2a28b253a229c4f6b58f2da0ff919267826ba51334f3809f0d2ca
+  sha256: 96f62fca4d8910f9406da2037f4a70f0e8eadb2742f2d07207617f21faea5047
 
 build:
   number: 0
@@ -23,6 +23,7 @@ requirements:
   run:
     - python
     - httpx >=0.20.0
+    - h2  # httpx[http2] extra
     - numpy >=1.21,<2.3.0  # [py==310]
     - numpy >=1.21  # [py==311]
     - numpy >=1.26  # [py==312]
@@ -32,10 +33,11 @@ requirements:
     - grpcio >=1.41.0
     - protobuf >=3.20.0
     - urllib3 >=1.26.14,<3
-    - portalocker >=2.7.0,<4.0
+    - portalocker >=2.7.0,<5.0
   run_constrained:
-    - fastembed >=0.8,<0.9
-    - fastembed-gpu >=0.8,<0.9
+    - fastembed >=0.9,<0.10
+    - fastembed-gpu >=0.9,<0.10
+    - orjson >=3.9.15
 
 {% set skip_tests = [
   "--ignore=tests/congruence_tests",
@@ -58,9 +60,8 @@ test:
   requires:
     - pip
     - python
-    - pytest >=7.1,<8
-    - pytest-asyncio
-    - pytest-docker-tools
+    - pytest >=7.1,<10.0
+    - pytest-asyncio >=1.3.0,<2.0.0
 
 about:
   home: https://github.com/qdrant/qdrant-client
